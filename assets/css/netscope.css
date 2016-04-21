@@ -136,7 +136,7 @@ h1, h2, h3 {
 
 .edgePath path {
     stroke: #554037;
-    fill: #554037;
+    fill: none;
     stroke-width: 1.5px;
 }
 .node-info-header {
