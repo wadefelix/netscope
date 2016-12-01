@@ -2260,7 +2260,7 @@ module.exports = Renderer = (function() {
 
   Renderer.prototype.generateLabel = function(layer) {
     if (!this.iconify) {
-      return '<div class="node-label">' + layer.name + '</div>';
+      return '<div class="node-label" onclick="scrolltothislayer(this.innerHTML)">' + layer.name + '</div>';
     } else {
       return '';
     }
@@ -2372,3 +2372,24 @@ module.exports = Renderer = (function() {
 
 
 },{}]},{},[6]);
+
+function scrolltothislayer(lbl) {
+    $(".CodeMirror-scroll").scrollTop(0);
+    lbl = "\""+lbl+"\"";
+    searchCurVisible = function () {
+        var searched = false;
+        var LayerNames = $("pre.CodeMirror-line span span.cm-def:contains('name')");
+        for (var i = 0; i < LayerNames.length; i++) {
+            if ( lbl == LayerNames[i].nextElementSibling.innerHTML) {
+                LayerNames[i].scrollIntoView(true);
+                searched = true;
+                break;
+            }
+        }
+        if (!searched) {
+            LayerNames[LayerNames.length - 1].scrollIntoView(true);
+            setTimeout(searchCurVisible,100);
+        }
+    }
+setTimeout(searchCurVisible, 100);
+}
