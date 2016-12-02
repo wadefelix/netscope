@@ -2374,11 +2374,10 @@ module.exports = Renderer = (function() {
 },{}]},{},[6]);
 
 function scrolltothislayer(lbl) {
-    $(".CodeMirror-scroll").scrollTop(0);
     lbl = "\""+lbl+"\"";
     searchCurVisible = function () {
         var searched = false;
-        var LayerNames = $("pre.CodeMirror-line span span.cm-def:contains('name')");
+        var LayerNames = $("pre.CodeMirror-line span span.cm-def:contains('name'),pre.CodeMirror-line span span.cm-def:contains('input')");
         for (var i = 0; i < LayerNames.length; i++) {
             if ( lbl == LayerNames[i].nextElementSibling.innerHTML) {
                 LayerNames[i].scrollIntoView(true);
@@ -2388,8 +2387,13 @@ function scrolltothislayer(lbl) {
         }
         if (!searched) {
             LayerNames[LayerNames.length - 1].scrollIntoView(true);
-            setTimeout(searchCurVisible,100);
+            setTimeout(searchCurVisible,0);
         }
+        return searched;
     }
-setTimeout(searchCurVisible, 100);
+    if (searchCurVisible()) {
+    } else {
+        $(".CodeMirror-scroll").scrollTop(0);
+        setTimeout(searchCurVisible, 0);
+    }
 }
