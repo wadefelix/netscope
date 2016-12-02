@@ -2374,12 +2374,12 @@ module.exports = Renderer = (function() {
 },{}]},{},[6]);
 
 function scrolltothislayer(lbl) {
-    lbl = "\""+lbl+"\"";
+    lbl = new RegExp("['\"]"+lbl+"['\"]", 'i');
     searchCurVisible = function () {
         var searched = false;
         var LayerNames = $("pre.CodeMirror-line span span.cm-def:contains('name'),pre.CodeMirror-line span span.cm-def:contains('input')");
         for (var i = 0; i < LayerNames.length; i++) {
-            if ( lbl == LayerNames[i].nextElementSibling.innerHTML) {
+            if ( lbl.test(LayerNames[i].nextElementSibling.innerHTML) ) {
                 LayerNames[i].scrollIntoView(true);
                 searched = true;
                 break;
