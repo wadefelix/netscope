@@ -81,11 +81,13 @@ class Renderer
         s = ''
         for own key of section
             val = section[key]
-            isSection = (typeof val is 'object') and not Array.isArray(val)
+            isScalarArray = Array.isArray(val) and ((val.length==0) or (typeof val[0] isnt 'object'))
+            isSection = (typeof val is 'object') and not isScalarArray
             if isSection
                 s += '<div class="node-param-section-title node-param-key">'+@renderKey(key)+'</div>'
                 s += '<div class="node-param-section">'
-                s+= @renderSection val
+                for subSection in [].concat(val)
+                  s += @renderSection subSection
             else
                 s += '<div class="node-param-row">'
                 s += '<span class="node-param-key">'+@renderKey(key)+': </span>'
@@ -115,14 +117,12 @@ class Renderer
         graphRender svgGroup, @graph
 
         # Size to fit.
-        # TODO: Find a more robust way of doing this.
-        # getBBox appears to do the right thing on Chrome,
-        # but not on Firefox. getBoundingClientRect works on both.
-        bbox = svgGroup.node().getBoundingClientRect()
-        # On Chrome, the bounding box may be off by a stroke-width.
-        margin = 2
-        svg.attr('width', Math.ceil(bbox.width)+margin)
-        svg.attr('height', Math.ceil(bbox.height)+margin)
+        bbox = svgGroup.node().getBBox()
+        svgGroup.attr('transform', 'translate('+Math.ceil(-bbox.x)+')')
+        # The size does not include the stroke width. Include an additional margin.
+        margin = 5
+        svg.attr('width', Math.ceil(bbox.width+2*margin))
+        svg.attr('height', Math.ceil(bbox.height+2*margin))
 
         # Configure Tooltips.
         tipPositions =
