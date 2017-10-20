@@ -1970,7 +1970,7 @@ module.exports = Loader = (function() {
     return $.ajax({
       url: url,
       success: (function(_this) {
-        return function() {
+        return function(data) {
           return _this.load(data, callback);
         };
       })(this)
