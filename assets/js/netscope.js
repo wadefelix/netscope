@@ -2268,7 +2268,7 @@ module.exports = Renderer = (function() {
 
   Renderer.prototype.generateLabel = function(layer) {
     if (!this.iconify) {
-      return '<div class="node-label" onclick="scrolltothislayer(this.innerHTML)">' + layer.name + '</div>';
+      return '<div class="node-label" onclick="scrolltothislayer(this.innerHTML,\''+layer.type+'\')">' + layer.name + '</div>';
     } else {
       return '';
     }
@@ -2387,11 +2387,18 @@ module.exports = Renderer = (function() {
 
 },{}]},{},[6]);
 
-function scrolltothislayer(lbl) {
+function scrolltothislayer(lbl, lbltype) {
+    if ($(".CodeMirror-scroll").length<1) return;
+    // implicit隐含层是没有层定义的是找不到的，所以其实不需要找啊。或者找产生这个层的层，即找top是这个隐含层的层。
+    var querystr = ( (lbltype=='implicit') ? (
+                     "pre.CodeMirror-line span span.cm-def:contains('top')" ) : (
+                     "pre.CodeMirror-line span span.cm-def:contains('name'),pre.CodeMirror-line span span.cm-def:contains('input')" ) );
+    var notfoundcnt = 0;
     lbl = new RegExp("['\"]"+lbl+"['\"]", 'i');
     searchCurVisible = function () {
         var searched = false;
-        var LayerNames = $("pre.CodeMirror-line span span.cm-def:contains('name'),pre.CodeMirror-line span span.cm-def:contains('input')");
+        var LayerNames = $(querystr);
+
         for (var i = 0; i < LayerNames.length; i++) {
             if ( lbl.test(LayerNames[i].nextElementSibling.innerHTML) ) {
                 LayerNames[i].scrollIntoView(true);
@@ -2400,8 +2407,13 @@ function scrolltothislayer(lbl) {
             }
         }
         if (!searched) {
-            LayerNames[LayerNames.length - 1].scrollIntoView(true);
-            setTimeout(searchCurVisible,0);
+            if (notfoundcnt < 50) {
+                LayerNames[LayerNames.length - 1].scrollIntoView(true);
+                setTimeout(searchCurVisible,0);
+            } else {
+                console.log(lbl + ' not found.')
+            }
+            notfoundcnt += 1;
         }
         return searched;
     }
